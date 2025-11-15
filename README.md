@@ -10,34 +10,3 @@ An autonomous marketplace infrastructure enabling AI agents to discover, transac
 
 ![System Design](System_design.png)
 
-```
-┌─────────────────────────────────────────────────┐
-│           Frontend Dashboard (React)             │
-│        Service Discovery & Transaction Monitor   │
-└─────────────────┬───────────────────────────────┘
-                  │
-┌─────────────────▼───────────────────────────────┐
-│         Backend API (Node.js + Express)          │
-│   Service Registry │ Payment Handler │ Discovery │
-└─────────────────┬───────────────────────────────┘
-                  │
-        ┌─────────┴─────────┐
-        │                   │
-┌───────▼────────┐  ┌──────▼──────────┐
-│ ServiceRegistry│  │ PaymentEscrow   │
-│   Contract     │  │   Contract      │
-│    (ink!)      │  │    (ink!)       │
-└────────────────┘  └─────────────────┘
-        │                   │
-        └─────────┬─────────┘
-                  │
-        ┌─────────▼─────────┐
-        │  Polkadot Testnet │
-        │  (Rococo/Westend) │
-        └───────────────────┘
-
-┌──────────────┐              ┌──────────────┐
-│Provider Agent│◄────────────►│Consumer Agent│
-│ (Autonomous) │   Services   │ (Autonomous) │
-└──────────────┘              └──────────────┘
-```
