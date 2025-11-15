@@ -8,6 +8,8 @@ An autonomous marketplace infrastructure enabling AI agents to discover, transac
 
 ## Solution Architecture
 
+![System Design](System_design.png)
+
 ```
 ┌─────────────────────────────────────────────────┐
 │           Frontend Dashboard (React)             │
