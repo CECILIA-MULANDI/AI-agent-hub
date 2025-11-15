@@ -1,8 +1,9 @@
 [package]
-name = "service_registry"
+name = "payment_escrow"
 version = "0.1.0"
 authors = ["Cecilia Mulandi <mulandicecilia4@gmail.com>"]
-edition = "2021"
+edition = "2024"
+
 
 [dependencies]
 ink = { version = "6.0.0-beta.1", default-features = false }
