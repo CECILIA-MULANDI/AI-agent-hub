@@ -8,5 +8,5 @@ An autonomous marketplace infrastructure enabling AI agents to discover, transac
 
 ## Solution Architecture
 
-![System Design](System_design.png)
+![System Design](Systems_design.png)
 
