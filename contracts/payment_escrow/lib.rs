@@ -2,12 +2,12 @@
 
 #[ink::contract]
 mod payment_escrow {
-    
-   
-    use ink::primitives::H160;
-    use ink::prelude::vec::Vec;
-    use ink::storage::Mapping;
+
     use ink::prelude::string::String;
+    use ink::prelude::vec::Vec;
+    use ink::primitives::H160;
+    use ink::storage::Mapping;
+    use ink::H256;
     /// Different statuses of an escrow
     #[derive(Debug, PartialEq, Eq, Clone)]
     #[ink::scale_derive(Encode, Decode, TypeInfo)]
@@ -22,10 +22,7 @@ mod payment_escrow {
     /// Escrow details
     #[derive(Debug, PartialEq, Eq, Clone)]
     #[ink::scale_derive(Encode, Decode, TypeInfo)]
-    #[cfg_attr(
-        feature = "std",
-        derive(ink::storage::traits::StorageLayout)
-    )]
+    #[cfg_attr(feature = "std", derive(ink::storage::traits::StorageLayout))]
     pub struct EscrowDetails {
         pub id: u64,
         pub payer: H160,
@@ -36,11 +33,15 @@ mod payment_escrow {
         pub created_at: u64,
         pub completed_at: Option<u64>,
         pub payment_code: String,
+        // x402 Protocol Integration
+        pub uses_x402: bool,
+        pub x402_payment_hash: Option<H256>,
+        pub x402_verified: bool,
+        pub x402_token_address: Option<H160>,
     }
 
-    
     /// Errors
-       #[derive(Debug, PartialEq, Eq, Copy, Clone)]
+    #[derive(Debug, PartialEq, Eq, Copy, Clone)]
     #[ink::scale_derive(Encode, Decode, TypeInfo)]
     pub enum Error {
         /// Emitted when the escrow is not found
@@ -63,7 +64,7 @@ mod payment_escrow {
 
     /// Result type
     pub type Result<T> = core::result::Result<T, Error>;
-   /// Storage for our escrow contract
+    /// Storage for our escrow contract
     #[ink(storage)]
     pub struct PaymentEscrow {
         escrows: Mapping<u64, EscrowDetails>,
@@ -71,7 +72,6 @@ mod payment_escrow {
         user_escrows: Mapping<H160, Vec<u64>>,
         // Timeout period in milliseconds (e.g., 1 hour = 3600000)
         escrow_timeout: u64,
-
     }
     /// Events
     #[ink(event)]
@@ -84,6 +84,21 @@ mod payment_escrow {
         payee: H160,
         amount: Balance,
         service_id: u64,
+    }
+    #[ink(event)]
+    pub struct X402PaymentLinked {
+        #[ink(topic)]
+        escrow_id: u64,
+        #[ink(topic)]
+        payment_hash: H256,
+    }
+
+    #[ink(event)]
+    pub struct X402PaymentVerified {
+        #[ink(topic)]
+        escrow_id: u64,
+        #[ink(topic)]
+        payee: H160,
     }
 
     #[ink(event)]
@@ -119,12 +134,12 @@ mod payment_escrow {
                 escrows: Mapping::default(),
                 escrow_count: 0,
                 user_escrows: Mapping::default(),
-                escrow_timeout
+                escrow_timeout,
             }
         }
         #[ink(constructor)]
         pub fn default() -> Self {
-            Self::new(3600000) 
+            Self::new(3600000)
         }
         /// Creates an escrow
         #[ink(message, payable)]
@@ -133,12 +148,15 @@ mod payment_escrow {
             payee: H160,
             service_id: u64,
             payment_code: String,
+            uses_x402: bool,
+            x402_token_address: Option<H160>,
         ) -> Result<u64> {
             let payer = self.env().caller();
             let amount = self.env().transferred_value();
 
-            // Validate amount
-            if amount == Balance::from(0u128).into() {
+            // For x402 escrows, amount might be 0 (payment happens off-chain via x402)
+            // For traditional escrows, amount must be > 0
+            if !uses_x402 && amount == Balance::from(0u128).into() {
                 return Err(Error::InvalidAmount);
             }
 
@@ -157,6 +175,10 @@ mod payment_escrow {
                 created_at: self.env().block_timestamp(),
                 completed_at: None,
                 payment_code,
+                uses_x402,
+                x402_payment_hash: None,
+                x402_verified: false,
+                x402_token_address,
             };
 
             // Store escrow
@@ -182,8 +204,7 @@ mod payment_escrow {
 
             Ok(escrow_id)
         }
-
-        /// Release payment to provider 
+        /// Release payment to provider
         #[ink(message)]
         pub fn release_payment(&mut self, escrow_id: u64) -> Result<()> {
             let caller = self.env().caller();
@@ -199,13 +220,22 @@ mod payment_escrow {
                 return Err(Error::InvalidStatus);
             }
 
+            // For x402 escrows, use the x402 release method
+            if escrow.uses_x402 {
+                return Err(Error::InvalidStatus); 
+            }
+
             // Check if expired
             if self.is_escrow_expired(escrow_id)? {
                 return Err(Error::EscrowExpired);
             }
 
             // Transfer funds to payee
-            if self.env().transfer(escrow.payee, escrow.amount.into()).is_err() {
+            if self
+                .env()
+                .transfer(escrow.payee, escrow.amount.into())
+                .is_err()
+            {
                 return Err(Error::TransferFailed);
             }
 
@@ -246,7 +276,11 @@ mod payment_escrow {
             }
 
             // Transfer funds to payee
-            if self.env().transfer(escrow.payee, escrow.amount.into()).is_err() {
+            if self
+                .env()
+                .transfer(escrow.payee, escrow.amount.into())
+                .is_err()
+            {
                 return Err(Error::TransferFailed);
             }
 
@@ -285,7 +319,11 @@ mod payment_escrow {
             }
 
             // Transfer funds back to payer
-            if self.env().transfer(escrow.payer, escrow.amount.into()).is_err() {
+            if self
+                .env()
+                .transfer(escrow.payer, escrow.amount.into())
+                .is_err()
+            {
                 return Err(Error::TransferFailed);
             }
 
@@ -302,6 +340,124 @@ mod payment_escrow {
             });
 
             Ok(())
+        }
+        /// Link x402 payment to escrow (called after x402 payment is made)
+        #[ink(message)]
+        pub fn link_x402_payment(&mut self, escrow_id: u64, x402_payment_hash: H256) -> Result<()> {
+            let caller = self.env().caller();
+            let mut escrow = self.escrows.get(escrow_id).ok_or(Error::EscrowNotFound)?;
+
+            // Check authorization (payer or payee can link)
+            if escrow.payer != caller && escrow.payee != caller {
+                return Err(Error::Unauthorized);
+            }
+
+            // Check if escrow uses x402
+            if !escrow.uses_x402 {
+                return Err(Error::InvalidStatus);
+            }
+
+            // Check status
+            if escrow.status != EscrowStatus::Pending {
+                return Err(Error::InvalidStatus);
+            }
+
+            escrow.x402_payment_hash = Some(x402_payment_hash);
+            self.escrows.insert(escrow_id, &escrow);
+
+            Ok(())
+        }
+
+        /// Verify x402 payment and mark as verified
+        /// In a real implementation, this would verify the payment on-chain
+        /// For now, it's a placeholder that can be called by authorized parties
+        #[ink(message)]
+        pub fn verify_x402_payment(&mut self, escrow_id: u64) -> Result<()> {
+            let caller = self.env().caller();
+            let mut escrow = self.escrows.get(escrow_id).ok_or(Error::EscrowNotFound)?;
+
+            // Check authorization (payee can verify, or could be an oracle/verifier)
+            if escrow.payee != caller {
+                return Err(Error::Unauthorized);
+            }
+
+            // Check if escrow uses x402
+            if !escrow.uses_x402 {
+                return Err(Error::InvalidStatus);
+            }
+
+            // Check if payment hash exists
+            if escrow.x402_payment_hash.is_none() {
+                return Err(Error::InvalidStatus);
+            }
+
+            // Check status
+            if escrow.status != EscrowStatus::Pending {
+                return Err(Error::InvalidStatus);
+            }
+
+            // TODO: In production, verify the payment hash on-chain
+            // For now, we mark it as verified
+            escrow.x402_verified = true;
+            self.escrows.insert(escrow_id, &escrow);
+
+            Ok(())
+        }
+
+        /// Release payment for x402 escrow (after x402 payment is verified)
+        #[ink(message)]
+        pub fn release_x402_payment(&mut self, escrow_id: u64) -> Result<()> {
+            let caller = self.env().caller();
+            let mut escrow = self.escrows.get(escrow_id).ok_or(Error::EscrowNotFound)?;
+
+            // Check authorization (payee can release after verification)
+            if escrow.payee != caller {
+                return Err(Error::Unauthorized);
+            }
+
+            // Check if escrow uses x402
+            if !escrow.uses_x402 {
+                return Err(Error::InvalidStatus);
+            }
+
+            // Check status
+            if escrow.status != EscrowStatus::Pending {
+                return Err(Error::InvalidStatus);
+            }
+
+            // Check if x402 payment is verified
+            if !escrow.x402_verified {
+                return Err(Error::InvalidStatus);
+            }
+
+            // For x402 escrows, the payment already happened via x402 gateway
+            // This just marks the escrow as completed
+            escrow.status = EscrowStatus::Completed;
+            escrow.completed_at = Some(self.env().block_timestamp());
+            self.escrows.insert(escrow_id, &escrow);
+
+            // Emit event
+            self.env().emit_event(EscrowCompleted {
+                escrow_id,
+                payee: escrow.payee,
+                amount: escrow.amount,
+            });
+
+            Ok(())
+        }
+
+        /// Get x402 payment hash for an escrow
+        #[ink(message)]
+        pub fn get_x402_payment_hash(&self, escrow_id: u64) -> Result<Option<H256>> {
+            let escrow = self.escrows.get(escrow_id).ok_or(Error::EscrowNotFound)?;
+            Ok(escrow.x402_payment_hash)
+        }
+
+        /// Check if escrow uses x402
+        #[ink(message)]
+        pub fn is_x402_escrow(&self, escrow_id: u64) -> Result<bool> {
+            let escrow = self.escrows.get(escrow_id).ok_or(Error::EscrowNotFound)?;
+            Ok(escrow.uses_x402)
         }
 
         /// Dispute an escrow
@@ -365,8 +521,5 @@ mod payment_escrow {
         pub fn get_escrow_timeout(&self) -> u64 {
             self.escrow_timeout
         }
-
     }
-
-   
 }
