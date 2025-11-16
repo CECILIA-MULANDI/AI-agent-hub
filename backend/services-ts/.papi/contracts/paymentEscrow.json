@@ -1,0 +1,2234 @@
+{
+  "source": {
+    "hash": "0xc39fbaf56a53f6a4221bef5cafabab35074b121bda1c1d7eec78ad98ead6d8da",
+    "language": "ink! 6.0.0-beta.1",
+    "compiler": "rustc 1.88.0",
+    "build_info": {
+      "rust_toolchain": "stable-x86_64-unknown-linux-gnu",
+      "cargo_contract_version": "6.0.0-alpha.4",
+      "build_mode": "Release"
+    }
+  },
+  "contract": {
+    "name": "payment_escrow",
+    "version": "0.1.0",
+    "authors": [
+      "Cecilia Mulandi <mulandicecilia4@gmail.com>"
+    ]
+  },
+  "image": null,
+  "version": 6,
+  "types": [
+    {
+      "id": 0,
+      "type": {
+        "def": {
+          "primitive": "u64"
+        }
+      }
+    },
+    {
+      "id": 1,
+      "type": {
+        "path": [
+          "primitive_types",
+          "H160"
+        ],
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "type": 2,
+                "typeName": "[u8; 20]"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": {
+        "def": {
+          "array": {
+            "len": 20,
+            "type": 3
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": {
+        "def": {
+          "primitive": "u8"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": {
+        "def": {
+          "primitive": "u128"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": {
+        "def": {
+          "primitive": "str"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": {
+        "def": {
+          "primitive": "bool"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": {
+        "path": [
+          "primitive_types",
+          "H256"
+        ],
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "type": 8,
+                "typeName": "[u8; 32]"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 8,
+      "type": {
+        "def": {
+          "array": {
+            "len": 32,
+            "type": 3
+          }
+        }
+      }
+    },
+    {
+      "id": 9,
+      "type": {
+        "path": [
+          "ink_storage",
+          "lazy",
+          "mapping",
+          "Mapping"
+        ],
+        "params": [
+          {
+            "name": "K",
+            "type": 0
+          },
+          {
+            "name": "V",
+            "type": 10
+          },
+          {
+            "name": "KeyType",
+            "type": 15
+          }
+        ],
+        "def": {
+          "composite": {}
+        }
+      }
+    },
+    {
+      "id": 10,
+      "type": {
+        "path": [
+          "payment_escrow",
+          "payment_escrow",
+          "EscrowDetails"
+        ],
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "name": "id",
+                "type": 0,
+                "typeName": "u64"
+              },
+              {
+                "name": "payer",
+                "type": 1,
+                "typeName": "H160"
+              },
+              {
+                "name": "payee",
+                "type": 1,
+                "typeName": "H160"
+              },
+              {
+                "name": "amount",
+                "type": 4,
+                "typeName": "Balance"
+              },
+              {
+                "name": "service_id",
+                "type": 0,
+                "typeName": "u64"
+              },
+              {
+                "name": "status",
+                "type": 11,
+                "typeName": "EscrowStatus"
+              },
+              {
+                "name": "created_at",
+                "type": 0,
+                "typeName": "u64"
+              },
+              {
+                "name": "completed_at",
+                "type": 12,
+                "typeName": "Option<u64>"
+              },
+              {
+                "name": "payment_code",
+                "type": 5,
+                "typeName": "String"
+              },
+              {
+                "name": "uses_x402",
+                "type": 6,
+                "typeName": "bool"
+              },
+              {
+                "name": "x402_payment_hash",
+                "type": 13,
+                "typeName": "Option<H256>"
+              },
+              {
+                "name": "x402_verified",
+                "type": 6,
+                "typeName": "bool"
+              },
+              {
+                "name": "x402_token_address",
+                "type": 14,
+                "typeName": "Option<H160>"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 11,
+      "type": {
+        "path": [
+          "payment_escrow",
+          "payment_escrow",
+          "EscrowStatus"
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "Pending",
+                "index": 0
+              },
+              {
+                "name": "Completed",
+                "index": 1
+              },
+              {
+                "name": "Refunded",
+                "index": 2
+              },
+              {
+                "name": "Disputed",
+                "index": 3
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 12,
+      "type": {
+        "path": [
+          "Option"
+        ],
+        "params": [
+          {
+            "name": "T",
+            "type": 0
+          }
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "None",
+                "index": 0
+              },
+              {
+                "name": "Some",
+                "fields": [
+                  {
+                    "type": 0
+                  }
+                ],
+                "index": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 13,
+      "type": {
+        "path": [
+          "Option"
+        ],
+        "params": [
+          {
+            "name": "T",
+            "type": 7
+          }
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "None",
+                "index": 0
+              },
+              {
+                "name": "Some",
+                "fields": [
+                  {
+                    "type": 7
+                  }
+                ],
+                "index": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 14,
+      "type": {
+        "path": [
+          "Option"
+        ],
+        "params": [
+          {
+            "name": "T",
+            "type": 1
+          }
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "None",
+                "index": 0
+              },
+              {
+                "name": "Some",
+                "fields": [
+                  {
+                    "type": 1
+                  }
+                ],
+                "index": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 15,
+      "type": {
+        "path": [
+          "ink_storage_traits",
+          "impls",
+          "ResolverKey"
+        ],
+        "params": [
+          {
+            "name": "L",
+            "type": 16
+          },
+          {
+            "name": "R",
+            "type": 17
+          }
+        ],
+        "def": {
+          "composite": {}
+        }
+      }
+    },
+    {
+      "id": 16,
+      "type": {
+        "path": [
+          "ink_storage_traits",
+          "impls",
+          "AutoKey"
+        ],
+        "def": {
+          "composite": {}
+        }
+      }
+    },
+    {
+      "id": 17,
+      "type": {
+        "path": [
+          "ink_storage_traits",
+          "impls",
+          "ManualKey"
+        ],
+        "params": [
+          {
+            "name": "ParentKey",
+            "type": 18
+          }
+        ],
+        "def": {
+          "composite": {}
+        }
+      }
+    },
+    {
+      "id": 18,
+      "type": {
+        "def": {
+          "tuple": []
+        }
+      }
+    },
+    {
+      "id": 19,
+      "type": {
+        "def": {
+          "sequence": {
+            "type": 0
+          }
+        }
+      }
+    },
+    {
+      "id": 20,
+      "type": {
+        "path": [
+          "ink_storage",
+          "lazy",
+          "mapping",
+          "Mapping"
+        ],
+        "params": [
+          {
+            "name": "K",
+            "type": 1
+          },
+          {
+            "name": "V",
+            "type": 19
+          },
+          {
+            "name": "KeyType",
+            "type": 21
+          }
+        ],
+        "def": {
+          "composite": {}
+        }
+      }
+    },
+    {
+      "id": 21,
+      "type": {
+        "path": [
+          "ink_storage_traits",
+          "impls",
+          "ResolverKey"
+        ],
+        "params": [
+          {
+            "name": "L",
+            "type": 16
+          },
+          {
+            "name": "R",
+            "type": 22
+          }
+        ],
+        "def": {
+          "composite": {}
+        }
+      }
+    },
+    {
+      "id": 22,
+      "type": {
+        "path": [
+          "ink_storage_traits",
+          "impls",
+          "ManualKey"
+        ],
+        "params": [
+          {
+            "name": "ParentKey",
+            "type": 18
+          }
+        ],
+        "def": {
+          "composite": {}
+        }
+      }
+    },
+    {
+      "id": 23,
+      "type": {
+        "path": [
+          "payment_escrow",
+          "payment_escrow",
+          "PaymentEscrow"
+        ],
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "name": "escrows",
+                "type": 9,
+                "typeName": "<Mapping<u64, EscrowDetails> as::ink::storage::traits::\nAutoStorableHint<::ink::storage::traits::ManualKey<2113050911u32,\n()>,>>::Type"
+              },
+              {
+                "name": "escrow_count",
+                "type": 0,
+                "typeName": "<u64 as::ink::storage::traits::AutoStorableHint<::ink::storage\n::traits::ManualKey<2709972705u32, ()>,>>::Type"
+              },
+              {
+                "name": "user_escrows",
+                "type": 20,
+                "typeName": "<Mapping<H160, Vec<u64>> as::ink::storage::traits::\nAutoStorableHint<::ink::storage::traits::ManualKey<2248676090u32,\n()>,>>::Type"
+              },
+              {
+                "name": "escrow_timeout",
+                "type": 0,
+                "typeName": "<u64 as::ink::storage::traits::AutoStorableHint<::ink::storage\n::traits::ManualKey<1571209950u32, ()>,>>::Type"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 24,
+      "type": {
+        "path": [
+          "Result"
+        ],
+        "params": [
+          {
+            "name": "T",
+            "type": 18
+          },
+          {
+            "name": "E",
+            "type": 25
+          }
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "Ok",
+                "fields": [
+                  {
+                    "type": 18
+                  }
+                ],
+                "index": 0
+              },
+              {
+                "name": "Err",
+                "fields": [
+                  {
+                    "type": 25
+                  }
+                ],
+                "index": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 25,
+      "type": {
+        "path": [
+          "ink_primitives",
+          "LangError"
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "CouldNotReadInput",
+                "index": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 26,
+      "type": {
+        "path": [
+          "Result"
+        ],
+        "params": [
+          {
+            "name": "T",
+            "type": 27
+          },
+          {
+            "name": "E",
+            "type": 25
+          }
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "Ok",
+                "fields": [
+                  {
+                    "type": 27
+                  }
+                ],
+                "index": 0
+              },
+              {
+                "name": "Err",
+                "fields": [
+                  {
+                    "type": 25
+                  }
+                ],
+                "index": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 27,
+      "type": {
+        "path": [
+          "Result"
+        ],
+        "params": [
+          {
+            "name": "T",
+            "type": 0
+          },
+          {
+            "name": "E",
+            "type": 28
+          }
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "Ok",
+                "fields": [
+                  {
+                    "type": 0
+                  }
+                ],
+                "index": 0
+              },
+              {
+                "name": "Err",
+                "fields": [
+                  {
+                    "type": 28
+                  }
+                ],
+                "index": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 28,
+      "type": {
+        "path": [
+          "payment_escrow",
+          "payment_escrow",
+          "Error"
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "EscrowNotFound",
+                "index": 0
+              },
+              {
+                "name": "Unauthorized",
+                "index": 1
+              },
+              {
+                "name": "InvalidAmount",
+                "index": 2
+              },
+              {
+                "name": "InvalidStatus",
+                "index": 3
+              },
+              {
+                "name": "InsufficientFunds",
+                "index": 4
+              },
+              {
+                "name": "TransferFailed",
+                "index": 5
+              },
+              {
+                "name": "AlreadyCompleted",
+                "index": 6
+              },
+              {
+                "name": "EscrowExpired",
+                "index": 7
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 29,
+      "type": {
+        "path": [
+          "Result"
+        ],
+        "params": [
+          {
+            "name": "T",
+            "type": 30
+          },
+          {
+            "name": "E",
+            "type": 25
+          }
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "Ok",
+                "fields": [
+                  {
+                    "type": 30
+                  }
+                ],
+                "index": 0
+              },
+              {
+                "name": "Err",
+                "fields": [
+                  {
+                    "type": 25
+                  }
+                ],
+                "index": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 30,
+      "type": {
+        "path": [
+          "Result"
+        ],
+        "params": [
+          {
+            "name": "T",
+            "type": 18
+          },
+          {
+            "name": "E",
+            "type": 28
+          }
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "Ok",
+                "fields": [
+                  {
+                    "type": 18
+                  }
+                ],
+                "index": 0
+              },
+              {
+                "name": "Err",
+                "fields": [
+                  {
+                    "type": 28
+                  }
+                ],
+                "index": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 31,
+      "type": {
+        "path": [
+          "Result"
+        ],
+        "params": [
+          {
+            "name": "T",
+            "type": 32
+          },
+          {
+            "name": "E",
+            "type": 25
+          }
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "Ok",
+                "fields": [
+                  {
+                    "type": 32
+                  }
+                ],
+                "index": 0
+              },
+              {
+                "name": "Err",
+                "fields": [
+                  {
+                    "type": 25
+                  }
+                ],
+                "index": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 32,
+      "type": {
+        "path": [
+          "Result"
+        ],
+        "params": [
+          {
+            "name": "T",
+            "type": 13
+          },
+          {
+            "name": "E",
+            "type": 28
+          }
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "Ok",
+                "fields": [
+                  {
+                    "type": 13
+                  }
+                ],
+                "index": 0
+              },
+              {
+                "name": "Err",
+                "fields": [
+                  {
+                    "type": 28
+                  }
+                ],
+                "index": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 33,
+      "type": {
+        "path": [
+          "Result"
+        ],
+        "params": [
+          {
+            "name": "T",
+            "type": 34
+          },
+          {
+            "name": "E",
+            "type": 25
+          }
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "Ok",
+                "fields": [
+                  {
+                    "type": 34
+                  }
+                ],
+                "index": 0
+              },
+              {
+                "name": "Err",
+                "fields": [
+                  {
+                    "type": 25
+                  }
+                ],
+                "index": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 34,
+      "type": {
+        "path": [
+          "Result"
+        ],
+        "params": [
+          {
+            "name": "T",
+            "type": 6
+          },
+          {
+            "name": "E",
+            "type": 28
+          }
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "Ok",
+                "fields": [
+                  {
+                    "type": 6
+                  }
+                ],
+                "index": 0
+              },
+              {
+                "name": "Err",
+                "fields": [
+                  {
+                    "type": 28
+                  }
+                ],
+                "index": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 35,
+      "type": {
+        "path": [
+          "Result"
+        ],
+        "params": [
+          {
+            "name": "T",
+            "type": 36
+          },
+          {
+            "name": "E",
+            "type": 25
+          }
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "Ok",
+                "fields": [
+                  {
+                    "type": 36
+                  }
+                ],
+                "index": 0
+              },
+              {
+                "name": "Err",
+                "fields": [
+                  {
+                    "type": 25
+                  }
+                ],
+                "index": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 36,
+      "type": {
+        "path": [
+          "Result"
+        ],
+        "params": [
+          {
+            "name": "T",
+            "type": 10
+          },
+          {
+            "name": "E",
+            "type": 28
+          }
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "Ok",
+                "fields": [
+                  {
+                    "type": 10
+                  }
+                ],
+                "index": 0
+              },
+              {
+                "name": "Err",
+                "fields": [
+                  {
+                    "type": 28
+                  }
+                ],
+                "index": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 37,
+      "type": {
+        "path": [
+          "Result"
+        ],
+        "params": [
+          {
+            "name": "T",
+            "type": 19
+          },
+          {
+            "name": "E",
+            "type": 25
+          }
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "Ok",
+                "fields": [
+                  {
+                    "type": 19
+                  }
+                ],
+                "index": 0
+              },
+              {
+                "name": "Err",
+                "fields": [
+                  {
+                    "type": 25
+                  }
+                ],
+                "index": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 38,
+      "type": {
+        "path": [
+          "Result"
+        ],
+        "params": [
+          {
+            "name": "T",
+            "type": 0
+          },
+          {
+            "name": "E",
+            "type": 25
+          }
+        ],
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "name": "Ok",
+                "fields": [
+                  {
+                    "type": 0
+                  }
+                ],
+                "index": 0
+              },
+              {
+                "name": "Err",
+                "fields": [
+                  {
+                    "type": 25
+                  }
+                ],
+                "index": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 39,
+      "type": {
+        "path": [
+          "ink_primitives",
+          "types",
+          "AccountId"
+        ],
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "type": 8,
+                "typeName": "[u8; 32]"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 40,
+      "type": {
+        "path": [
+          "ink_primitives",
+          "types",
+          "Hash"
+        ],
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "type": 8,
+                "typeName": "[u8; 32]"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 41,
+      "type": {
+        "def": {
+          "primitive": "u32"
+        }
+      }
+    }
+  ],
+  "storage": {
+    "root": {
+      "root_key": "0x00000000",
+      "layout": {
+        "struct": {
+          "name": "PaymentEscrow",
+          "fields": [
+            {
+              "name": "escrows",
+              "layout": {
+                "root": {
+                  "root_key": "0x1f99f27d",
+                  "layout": {
+                    "struct": {
+                      "name": "EscrowDetails",
+                      "fields": [
+                        {
+                          "name": "id",
+                          "layout": {
+                            "leaf": {
+                              "key": "0x1f99f27d",
+                              "ty": 0
+                            }
+                          }
+                        },
+                        {
+                          "name": "payer",
+                          "layout": {
+                            "leaf": {
+                              "key": "0x1f99f27d",
+                              "ty": 1
+                            }
+                          }
+                        },
+                        {
+                          "name": "payee",
+                          "layout": {
+                            "leaf": {
+                              "key": "0x1f99f27d",
+                              "ty": 1
+                            }
+                          }
+                        },
+                        {
+                          "name": "amount",
+                          "layout": {
+                            "leaf": {
+                              "key": "0x1f99f27d",
+                              "ty": 4
+                            }
+                          }
+                        },
+                        {
+                          "name": "service_id",
+                          "layout": {
+                            "leaf": {
+                              "key": "0x1f99f27d",
+                              "ty": 0
+                            }
+                          }
+                        },
+                        {
+                          "name": "status",
+                          "layout": {
+                            "enum": {
+                              "name": "EscrowStatus",
+                              "dispatchKey": "0x1f99f27d",
+                              "variants": {
+                                "0": {
+                                  "name": "Pending",
+                                  "fields": []
+                                },
+                                "1": {
+                                  "name": "Completed",
+                                  "fields": []
+                                },
+                                "2": {
+                                  "name": "Refunded",
+                                  "fields": []
+                                },
+                                "3": {
+                                  "name": "Disputed",
+                                  "fields": []
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "name": "created_at",
+                          "layout": {
+                            "leaf": {
+                              "key": "0x1f99f27d",
+                              "ty": 0
+                            }
+                          }
+                        },
+                        {
+                          "name": "completed_at",
+                          "layout": {
+                            "enum": {
+                              "name": "Option",
+                              "dispatchKey": "0x1f99f27d",
+                              "variants": {
+                                "0": {
+                                  "name": "None",
+                                  "fields": []
+                                },
+                                "1": {
+                                  "name": "Some",
+                                  "fields": [
+                                    {
+                                      "name": "0",
+                                      "layout": {
+                                        "leaf": {
+                                          "key": "0x1f99f27d",
+                                          "ty": 0
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "name": "payment_code",
+                          "layout": {
+                            "leaf": {
+                              "key": "0x1f99f27d",
+                              "ty": 5
+                            }
+                          }
+                        },
+                        {
+                          "name": "uses_x402",
+                          "layout": {
+                            "leaf": {
+                              "key": "0x1f99f27d",
+                              "ty": 6
+                            }
+                          }
+                        },
+                        {
+                          "name": "x402_payment_hash",
+                          "layout": {
+                            "enum": {
+                              "name": "Option",
+                              "dispatchKey": "0x1f99f27d",
+                              "variants": {
+                                "0": {
+                                  "name": "None",
+                                  "fields": []
+                                },
+                                "1": {
+                                  "name": "Some",
+                                  "fields": [
+                                    {
+                                      "name": "0",
+                                      "layout": {
+                                        "leaf": {
+                                          "key": "0x1f99f27d",
+                                          "ty": 7
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "name": "x402_verified",
+                          "layout": {
+                            "leaf": {
+                              "key": "0x1f99f27d",
+                              "ty": 6
+                            }
+                          }
+                        },
+                        {
+                          "name": "x402_token_address",
+                          "layout": {
+                            "enum": {
+                              "name": "Option",
+                              "dispatchKey": "0x1f99f27d",
+                              "variants": {
+                                "0": {
+                                  "name": "None",
+                                  "fields": []
+                                },
+                                "1": {
+                                  "name": "Some",
+                                  "fields": [
+                                    {
+                                      "name": "0",
+                                      "layout": {
+                                        "leaf": {
+                                          "key": "0x1f99f27d",
+                                          "ty": 1
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "ty": 9
+                }
+              }
+            },
+            {
+              "name": "escrow_count",
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 0
+                }
+              }
+            },
+            {
+              "name": "user_escrows",
+              "layout": {
+                "root": {
+                  "root_key": "0xfa120886",
+                  "layout": {
+                    "leaf": {
+                      "key": "0xfa120886",
+                      "ty": 19
+                    }
+                  },
+                  "ty": 20
+                }
+              }
+            },
+            {
+              "name": "escrow_timeout",
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 0
+                }
+              }
+            }
+          ]
+        }
+      },
+      "ty": 23
+    }
+  },
+  "spec": {
+    "constructors": [
+      {
+        "label": "new",
+        "selector": "0x9bae9d5e",
+        "payable": false,
+        "args": [
+          {
+            "label": "escrow_timeout",
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            }
+          }
+        ],
+        "returnType": {
+          "type": 24,
+          "displayName": [
+            "ink_primitives",
+            "ConstructorResult"
+          ]
+        },
+        "docs": [],
+        "default": false
+      },
+      {
+        "label": "default",
+        "selector": "0xed4b9d1b",
+        "payable": false,
+        "args": [],
+        "returnType": {
+          "type": 24,
+          "displayName": [
+            "ink_primitives",
+            "ConstructorResult"
+          ]
+        },
+        "docs": [],
+        "default": false
+      }
+    ],
+    "messages": [
+      {
+        "label": "create_escrow",
+        "selector": "0x547b21c4",
+        "mutates": true,
+        "payable": true,
+        "args": [
+          {
+            "label": "payee",
+            "type": {
+              "type": 1,
+              "displayName": [
+                "H160"
+              ]
+            }
+          },
+          {
+            "label": "service_id",
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            }
+          },
+          {
+            "label": "payment_code",
+            "type": {
+              "type": 5,
+              "displayName": [
+                "String"
+              ]
+            }
+          },
+          {
+            "label": "uses_x402",
+            "type": {
+              "type": 6,
+              "displayName": [
+                "bool"
+              ]
+            }
+          },
+          {
+            "label": "x402_token_address",
+            "type": {
+              "type": 14,
+              "displayName": [
+                "Option"
+              ]
+            }
+          }
+        ],
+        "returnType": {
+          "type": 26,
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ]
+        },
+        "docs": [
+          " Creates an escrow"
+        ],
+        "default": false
+      },
+      {
+        "label": "release_payment",
+        "selector": "0x4d698c96",
+        "mutates": true,
+        "payable": false,
+        "args": [
+          {
+            "label": "escrow_id",
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            }
+          }
+        ],
+        "returnType": {
+          "type": 29,
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ]
+        },
+        "docs": [
+          " Release payment to provider"
+        ],
+        "default": false
+      },
+      {
+        "label": "auto_release_payment",
+        "selector": "0x584f9c44",
+        "mutates": true,
+        "payable": false,
+        "args": [
+          {
+            "label": "escrow_id",
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            }
+          }
+        ],
+        "returnType": {
+          "type": 29,
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ]
+        },
+        "docs": [
+          " Auto-release payment (can be called by provider after timeout)"
+        ],
+        "default": false
+      },
+      {
+        "label": "refund",
+        "selector": "0xa5a47441",
+        "mutates": true,
+        "payable": false,
+        "args": [
+          {
+            "label": "escrow_id",
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            }
+          }
+        ],
+        "returnType": {
+          "type": 29,
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ]
+        },
+        "docs": [
+          " Refund payment to payer"
+        ],
+        "default": false
+      },
+      {
+        "label": "link_x402_payment",
+        "selector": "0x0e51f1b4",
+        "mutates": true,
+        "payable": false,
+        "args": [
+          {
+            "label": "escrow_id",
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            }
+          },
+          {
+            "label": "x402_payment_hash",
+            "type": {
+              "type": 7,
+              "displayName": [
+                "H256"
+              ]
+            }
+          }
+        ],
+        "returnType": {
+          "type": 29,
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ]
+        },
+        "docs": [
+          " Link x402 payment to escrow (called after x402 payment is made)"
+        ],
+        "default": false
+      },
+      {
+        "label": "verify_x402_payment",
+        "selector": "0xd1ef30c7",
+        "mutates": true,
+        "payable": false,
+        "args": [
+          {
+            "label": "escrow_id",
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            }
+          }
+        ],
+        "returnType": {
+          "type": 29,
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ]
+        },
+        "docs": [
+          " Verify x402 payment and mark as verified",
+          " In a real implementation, this would verify the payment on-chain",
+          " For now, it's a placeholder that can be called by authorized parties"
+        ],
+        "default": false
+      },
+      {
+        "label": "release_x402_payment",
+        "selector": "0x9df3f706",
+        "mutates": true,
+        "payable": false,
+        "args": [
+          {
+            "label": "escrow_id",
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            }
+          }
+        ],
+        "returnType": {
+          "type": 29,
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ]
+        },
+        "docs": [
+          " Release payment for x402 escrow (after x402 payment is verified)"
+        ],
+        "default": false
+      },
+      {
+        "label": "get_x402_payment_hash",
+        "selector": "0x4304abd5",
+        "mutates": false,
+        "payable": false,
+        "args": [
+          {
+            "label": "escrow_id",
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            }
+          }
+        ],
+        "returnType": {
+          "type": 31,
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ]
+        },
+        "docs": [
+          " Get x402 payment hash for an escrow"
+        ],
+        "default": false
+      },
+      {
+        "label": "is_x402_escrow",
+        "selector": "0x18af4b2d",
+        "mutates": false,
+        "payable": false,
+        "args": [
+          {
+            "label": "escrow_id",
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            }
+          }
+        ],
+        "returnType": {
+          "type": 33,
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ]
+        },
+        "docs": [
+          " Check if escrow uses x402"
+        ],
+        "default": false
+      },
+      {
+        "label": "dispute_escrow",
+        "selector": "0x7ae103fe",
+        "mutates": true,
+        "payable": false,
+        "args": [
+          {
+            "label": "escrow_id",
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            }
+          }
+        ],
+        "returnType": {
+          "type": 29,
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ]
+        },
+        "docs": [
+          " Dispute an escrow"
+        ],
+        "default": false
+      },
+      {
+        "label": "get_escrow",
+        "selector": "0x5d715835",
+        "mutates": false,
+        "payable": false,
+        "args": [
+          {
+            "label": "escrow_id",
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            }
+          }
+        ],
+        "returnType": {
+          "type": 35,
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ]
+        },
+        "docs": [
+          " Get escrow details"
+        ],
+        "default": false
+      },
+      {
+        "label": "get_user_escrows",
+        "selector": "0xaf1f70b1",
+        "mutates": false,
+        "payable": false,
+        "args": [
+          {
+            "label": "user",
+            "type": {
+              "type": 1,
+              "displayName": [
+                "H160"
+              ]
+            }
+          }
+        ],
+        "returnType": {
+          "type": 37,
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ]
+        },
+        "docs": [
+          " Get user escrows"
+        ],
+        "default": false
+      },
+      {
+        "label": "get_escrow_count",
+        "selector": "0x653be19c",
+        "mutates": false,
+        "payable": false,
+        "args": [],
+        "returnType": {
+          "type": 38,
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ]
+        },
+        "docs": [
+          " Get total escrow count"
+        ],
+        "default": false
+      },
+      {
+        "label": "is_escrow_expired",
+        "selector": "0xad23e718",
+        "mutates": false,
+        "payable": false,
+        "args": [
+          {
+            "label": "escrow_id",
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            }
+          }
+        ],
+        "returnType": {
+          "type": 33,
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ]
+        },
+        "docs": [
+          " Check if escrow is expired"
+        ],
+        "default": false
+      },
+      {
+        "label": "get_escrow_timeout",
+        "selector": "0x248109a6",
+        "mutates": false,
+        "payable": false,
+        "args": [],
+        "returnType": {
+          "type": 38,
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ]
+        },
+        "docs": [
+          " Get escrow timeout period"
+        ],
+        "default": false
+      }
+    ],
+    "events": [
+      {
+        "label": "EscrowCreated",
+        "module_path": "payment_escrow::payment_escrow",
+        "signature_topic": "0x042a22c4b4d29a0bbdb084f2dbf83450079826b433c1afb3e432525621e15971",
+        "args": [
+          {
+            "label": "escrow_id",
+            "indexed": true,
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            },
+            "docs": []
+          },
+          {
+            "label": "payer",
+            "indexed": true,
+            "type": {
+              "type": 1,
+              "displayName": [
+                "H160"
+              ]
+            },
+            "docs": []
+          },
+          {
+            "label": "payee",
+            "indexed": true,
+            "type": {
+              "type": 1,
+              "displayName": [
+                "H160"
+              ]
+            },
+            "docs": []
+          },
+          {
+            "label": "amount",
+            "indexed": false,
+            "type": {
+              "type": 4,
+              "displayName": [
+                "Balance"
+              ]
+            },
+            "docs": []
+          },
+          {
+            "label": "service_id",
+            "indexed": false,
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            },
+            "docs": []
+          }
+        ],
+        "docs": [
+          "Events"
+        ]
+      },
+      {
+        "label": "X402PaymentLinked",
+        "module_path": "payment_escrow::payment_escrow",
+        "signature_topic": "0x73c10621ec44eb91b82a3906b212d8aca9dba5c75938ee79fa1403d864753996",
+        "args": [
+          {
+            "label": "escrow_id",
+            "indexed": true,
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            },
+            "docs": []
+          },
+          {
+            "label": "payment_hash",
+            "indexed": true,
+            "type": {
+              "type": 7,
+              "displayName": [
+                "H256"
+              ]
+            },
+            "docs": []
+          }
+        ],
+        "docs": []
+      },
+      {
+        "label": "X402PaymentVerified",
+        "module_path": "payment_escrow::payment_escrow",
+        "signature_topic": "0x1338d037e4776ceb53ee5257c317bcecf81b4b2a2b28622dbdcd6518ef8376c1",
+        "args": [
+          {
+            "label": "escrow_id",
+            "indexed": true,
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            },
+            "docs": []
+          },
+          {
+            "label": "payee",
+            "indexed": true,
+            "type": {
+              "type": 1,
+              "displayName": [
+                "H160"
+              ]
+            },
+            "docs": []
+          }
+        ],
+        "docs": []
+      },
+      {
+        "label": "EscrowCompleted",
+        "module_path": "payment_escrow::payment_escrow",
+        "signature_topic": "0x7501e1b6c90b4b3c8407ade5eaf6f88a9b58c62c1ceca6c0b36378577f18b98f",
+        "args": [
+          {
+            "label": "escrow_id",
+            "indexed": true,
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            },
+            "docs": []
+          },
+          {
+            "label": "payee",
+            "indexed": true,
+            "type": {
+              "type": 1,
+              "displayName": [
+                "H160"
+              ]
+            },
+            "docs": []
+          },
+          {
+            "label": "amount",
+            "indexed": false,
+            "type": {
+              "type": 4,
+              "displayName": [
+                "Balance"
+              ]
+            },
+            "docs": []
+          }
+        ],
+        "docs": []
+      },
+      {
+        "label": "EscrowRefunded",
+        "module_path": "payment_escrow::payment_escrow",
+        "signature_topic": "0x5b83a7e219a5836fbc5001711e29b972f7960c4930dd9e0c70781ad3ef0a8608",
+        "args": [
+          {
+            "label": "escrow_id",
+            "indexed": true,
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            },
+            "docs": []
+          },
+          {
+            "label": "payer",
+            "indexed": true,
+            "type": {
+              "type": 1,
+              "displayName": [
+                "H160"
+              ]
+            },
+            "docs": []
+          },
+          {
+            "label": "amount",
+            "indexed": false,
+            "type": {
+              "type": 4,
+              "displayName": [
+                "Balance"
+              ]
+            },
+            "docs": []
+          }
+        ],
+        "docs": []
+      },
+      {
+        "label": "EscrowDisputed",
+        "module_path": "payment_escrow::payment_escrow",
+        "signature_topic": "0x8a58bc64632cf061f521a6ffe6c444dafd512907e521b12b20fc5a3b1953ad79",
+        "args": [
+          {
+            "label": "escrow_id",
+            "indexed": true,
+            "type": {
+              "type": 0,
+              "displayName": [
+                "u64"
+              ]
+            },
+            "docs": []
+          },
+          {
+            "label": "disputer",
+            "indexed": true,
+            "type": {
+              "type": 1,
+              "displayName": [
+                "H160"
+              ]
+            },
+            "docs": []
+          }
+        ],
+        "docs": []
+      }
+    ],
+    "docs": [],
+    "lang_error": {
+      "type": 25,
+      "displayName": [
+        "ink",
+        "LangError"
+      ]
+    },
+    "environment": {
+      "accountId": {
+        "type": 39,
+        "displayName": [
+          "AccountId"
+        ]
+      },
+      "balance": {
+        "type": 4,
+        "displayName": [
+          "Balance"
+        ]
+      },
+      "hash": {
+        "type": 40,
+        "displayName": [
+          "Hash"
+        ]
+      },
+      "timestamp": {
+        "type": 0,
+        "displayName": [
+          "Timestamp"
+        ]
+      },
+      "blockNumber": {
+        "type": 41,
+        "displayName": [
+          "BlockNumber"
+        ]
+      },
+      "nativeToEthRatio": 100000000,
+      "staticBufferSize": 16384
+    }
+  }
+}
